@@ -1,11 +1,21 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import css from './Home.module.css';
+import axios from 'axios';
 
 const Home = () => {
   const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+
+  const [properties, setProperties] = useState([]); 
+
+  useEffect(() => {
+    fetch('http://localhost:3001/properties')
+      .then(response => response.json())
+      .then(data => setProperties(data))
+      .catch(error => console.error('Error fetching properties:', error));
+  }, []);
 
   return (
     <div className={css.pageContainer}>
@@ -36,7 +46,28 @@ const Home = () => {
             <img src="/public/images/image-bg.png" alt="BackgroundImage"/>
         </div>
       </section>
-     
+      <section className={css.itemsSection}>
+        <div className={css.itemsSection__container}>
+        <h2 className={css.itemsSection__title}>Open Deals</h2>
+        <div className={css.itemsSection__content}>
+        {properties.map(property => (
+    <div className={css.itemsSection__contentItem} key={property.id}>
+      <img src={`/images/${property.srcImage}`} alt={property.title} />
+      <div className={css.data}>
+        <h6 className={css.data__title}>{property.title}</h6>
+        <div className={css.data__content}>
+          <div className={`${css.data__contentItem} ${css.data__Dhs}`}>{property.price}</div>
+          <div className={`${css.data__contentItem} ${css.data__Yield}`}>{property.yield}</div>
+          <div className={`${css.data__contentItem} ${css.data__Sold}`}>{property.sold}</div>
+          <div className={`${css.data__contentItem} ${css.data__Tiket}`}>{property.ticket}</div>
+          <div className={`${css.data__contentItem} ${css.data__Days}`}>{property.daysLeft}</div>
+        </div>
+      </div>
+    </div>
+  ))}
+        </div>
+        </div>
+      </section>
     </div>
   );
 };
